@@ -1,0 +1,15 @@
+const request = require('request-promise');
+const fs = require('fs');
+const cheerio = require('cheerio');
+
+async function main() {
+	const html = await request.get('https://www.ozon.ru/category/chayniki-i-kofeyniki-30814/');
+
+	fs.writeFileSync('./test.html', html);
+
+	const $ = await cheerio.load(html);
+	const title = $('h1').text();
+	console.log(title)
+}
+
+main();
