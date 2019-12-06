@@ -8,8 +8,10 @@ async function main() {
 	fs.writeFileSync('./test.html', html);
 
 	const $ = await cheerio.load(html);
-	const title = $('h1').text();
-	console.log(title)
+
+	$('.a2u7').each((index, item) => {
+		console.log($(item).text())
+	});
 }
 
 main();
