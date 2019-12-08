@@ -1,28 +1,56 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
-// const scrapingResults = {
-// 	{
-// 		title: 'Customer Service Manager - Call Center',
-// 		datePosted: new Date('20190-12-03 00:44:00'),
-// 		neighborhood: '(St. Petersburg, FL)',
-// 		url: 'https://stpetersburg.craigslist.org/csr/d/customer-service-manager-call-center/7030972798.html?lang=en&cc=us',
-// 		jobDescription: 'The Customer Service Manager is responsible for overseeing the daily activities of the program and for meeting or exceeding the personal performance measures established for the service team. The manager provides the foundation for success by contributing the needed resources, guidance and feedback. The company is looking for someone who has a strong background in managing and overseeing call centers and customer service representatives.',
-// 		compensation: 'Depending on Experience'
-// 	}
-// };
+async function scrapeList(page) {
+    const pageURL = 'https://www.ozon.ru/category/igrushki-i-igry-7108';
+    await page.goto(pageURL);
+
+    const html = await page.content();
+    const $ = await cheerio.load(html);
+
+    const result = await $('.tile-wrapper').map((index, link) => {
+        const cartUrl = $(link).attr('href');
+        return pageURL + $(link).attr('href');
+    }).get();
+
+    console.log('scrapeList done!');
+
+    return result;
+}
+
+async function scrapeCart(page, list) {
+    let result = [];
+    for(let i = 0; i < list.length; i++) {
+        const url = list[i];
+        await page.goto(url);
+        const html = await page.content();
+        const $ = await cheerio.load(html);
+
+        result.push({
+            url: url,
+            title: $('.detail h1 span').text()
+        });
+
+        await sleep(300);
+    }
+
+    console.log('scrapeCart done!');
+
+    return result;
+}
+
+async function sleep(ms) {
+    return new Promise((resolve, reject) => setTimeout(resolve, ms));
+}
 
 async function main() {
-	const browser = await puppeteer.launch({ headless: true });
-	const page = await browser.newPage();
-	await page.goto('https://stpetersburg.craigslist.org/d/jobs/search/jjj?lang=en&cc=us');
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
 
-	const html = await page.content();
-	const $ = await cheerio.load(html);
+    const list = await scrapeList(page);
+    const carts = await scrapeCart(page, list);
 
-	$('.result-title').each((index, item) => {
-		console.log($(item).text());
-	});
+    console.table(carts);
 }
 
 main();
