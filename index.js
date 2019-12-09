@@ -5,10 +5,12 @@ async function scrapeList(page) {
     const pageURL = 'https://www.ozon.ru/category/igrushki-i-igry-7108';
     await page.goto(pageURL);
 
+    await sleep(3000);
+
     const html = await page.content();
     const $ = await cheerio.load(html);
 
-    const result = await $('.tile-wrapper').map((index, link) => {
+    const result = await $('.widget-search-result-container a').map((index, link) => {
         const cartUrl = $(link).attr('href');
         return 'https://www.ozon.ru' + $(link).attr('href');
     }).get();
@@ -30,15 +32,19 @@ async function scrapeCart(page, list) {
         const $ = await cheerio.load(html);
 
         let optResult = [];
-        $('#section-characteristics .a0d5').each((index, item) => {
-        	const titles = $(item).find('.a0d').map((index, item) => {
+        $('#section-characteristics dl').each((index, item) => {
+        	const titles = $(item).find('dt span').map((index, item) => {
         		return $(item).text();
         	}).get();
-        	const values = $(item).find('.a0d2').map((index, item) => {
+        	const values = $(item).find('dd > div > *').map((index, item) => {
         		return $(item).text();
         	}).get();
 
         	titles.forEach((item, index) => {
+                console.log({
+                    title: item,
+                    value: values[index]
+                })
         		optResult.push({
         			title: item,
         			value: values[index]
@@ -46,16 +52,18 @@ async function scrapeCart(page, list) {
         	});
         });
 
-        result.push({
+        const toy = {
             url: url,
             title: $('.detail h1 span').text().trim(),
-            description: $('.a0j0').text().trim(),
+            description: $('#section-description > div > div > div > div').text().trim(),
             img: $('.magnifier-image img').attr('src'),
-            price: $('.a4k4').text().trim(),
+            price: $('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().trim(),
             options: optResult,
-        });
+        };
 
-        
+        console.log(toy)
+
+        result.push(toy);
     }
 
     console.log('scrapeCart done!');
