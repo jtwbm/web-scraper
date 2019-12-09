@@ -10,7 +10,7 @@ async function scrapeList(page) {
 
     const result = await $('.tile-wrapper').map((index, link) => {
         const cartUrl = $(link).attr('href');
-        return pageURL + $(link).attr('href');
+        return 'https://www.ozon.ru' + $(link).attr('href');
     }).get();
 
     console.log('scrapeList done!');
@@ -26,12 +26,33 @@ async function scrapeCart(page, list) {
         const html = await page.content();
         const $ = await cheerio.load(html);
 
-        result.push({
-            url: url,
-            title: $('.detail h1 span').text()
+        let optResult = [];
+        $('#section-characteristics .a0d5').each((index, item) => {
+        	const titles = $(item).find('.a0d').map((index, item) => {
+        		return $(item).text();
+        	}).get();
+        	const values = $(item).find('.a0d2 span').map((index, item) => {
+        		return $(item).text();
+        	}).get();
+
+        	titles.forEach((item, index) => {
+        		optResult.push({
+        			title: item,
+        			value: values[index]
+        		})
+        	});
         });
 
-        await sleep(300);
+        console.log(optResult)
+
+        result.push({
+            url: url,
+            title: $('.detail h1 span').text().trim(),
+            // description: $('.detail .a0j0').html(),
+            options: optResult,
+        });
+
+        // await sleep(300);
     }
 
     console.log('scrapeCart done!');
