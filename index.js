@@ -52,12 +52,14 @@ async function scrapeCart(page, list) {
         	});
         });
 
+        const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
+
         const toy = {
             url: url,
             title: $('.detail h1 span').text().trim(),
             description: $('#section-description > div > div > div > div').text().trim(),
             img: $('.magnifier-image img').attr('src'),
-            price: $('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().trim(),
+            price: price,
             options: optResult,
         };
 
