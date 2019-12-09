@@ -24,6 +24,9 @@ async function scrapeCart(page, list) {
         const url = list[i];
         await page.goto(url);
         const html = await page.content();
+
+        await sleep(1000);
+
         const $ = await cheerio.load(html);
 
         let optResult = [];
@@ -31,7 +34,7 @@ async function scrapeCart(page, list) {
         	const titles = $(item).find('.a0d').map((index, item) => {
         		return $(item).text();
         	}).get();
-        	const values = $(item).find('.a0d2 span').map((index, item) => {
+        	const values = $(item).find('.a0d2').map((index, item) => {
         		return $(item).text();
         	}).get();
 
@@ -43,16 +46,16 @@ async function scrapeCart(page, list) {
         	});
         });
 
-        console.log(optResult)
-
         result.push({
             url: url,
             title: $('.detail h1 span').text().trim(),
-            // description: $('.detail .a0j0').html(),
+            description: $('.a0j0').text().trim(),
+            img: $('.magnifier-image img').attr('src'),
+            price: $('.a4k4').text().trim(),
             options: optResult,
         });
 
-        // await sleep(300);
+        
     }
 
     console.log('scrapeCart done!');
@@ -71,7 +74,7 @@ async function main() {
     const list = await scrapeList(page);
     const carts = await scrapeCart(page, list);
 
-    console.table(carts);
+    console.log(carts);
 }
 
 main();
