@@ -6,7 +6,7 @@ const Listing = require('./model/Listing');
 
 
 async function connectToMongoDB() {
-    await mongoose.connect('mongodb+srv://scraper-admin:B5USZHDydUgy2zbx@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('connect to mongoDB');
 }
 
@@ -62,28 +62,14 @@ async function scrapeCart(page, list) {
         const toy = {
             title: $('.detail h1 span').text().trim(),
             description: $('#section-description > div > div > div > div').text().trim(),
-            img: `media/toys/${ i }.jpg`,
             category: 'toys',
+            img: await getImg($('.magnifier-image img').attr('src'), 'toys', page),
             price: price,
             options: optResult,
         };
 
-        const imgUrl = $('.magnifier-image img').attr('src');
-        const imgView = await page.goto(imgUrl);
-        const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
-        const imgPath = `./media/${ toy.category }/${ imgName }`;
-        if (!fs.existsSync(`./media/${ toy.category }/`)){
-            fs.mkdirSync(`./media/${ toy.category }/`);
-        }
-        fs.writeFile(imgPath, await imgView.buffer(), function (err) {
-            if (err) {
-                return console.log(err);
-            }
-        });
-        
-
-        const listingModel = new Listing(toy);
-        listingModel.save();
+        // const listingModel = new Listing(toy);
+        // listingModel.save();
 
         result.push(toy);
     }
@@ -91,6 +77,21 @@ async function scrapeCart(page, list) {
     console.log('scrapeCart done!');
 
     return result;
+}
+
+async function getImg(imgUrl, category, page) {
+    const imgView = await page.goto(imgUrl);
+    const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
+    const imgPath = `./media/${ category }/${ imgName }`;
+    if (!fs.existsSync(`./media/${ category }/`)){
+        fs.mkdirSync(`./media/${ category }/`);
+    }
+    fs.writeFile(imgPath, await imgView.buffer(), function (err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+    return imgPath;
 }
 
 async function sleep(ms) {
