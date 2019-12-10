@@ -1,5 +1,14 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+const mongoose = require('mongoose');
+const fs = require("fs");
+const Listing = require('./model/Listing');
+
+
+async function connectToMongoDB() {
+    await mongoose.connect('mongodb+srv://scraper-admin:B5USZHDydUgy2zbx@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('connect to mongoDB');
+}
 
 async function scrapeList(page) {
     const pageURL = 'https://www.ozon.ru/category/igrushki-i-igry-7108';
@@ -41,10 +50,6 @@ async function scrapeCart(page, list) {
         	}).get();
 
         	titles.forEach((item, index) => {
-                console.log({
-                    title: item,
-                    value: values[index]
-                })
         		optResult.push({
         			title: item,
         			value: values[index]
@@ -55,15 +60,30 @@ async function scrapeCart(page, list) {
         const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
 
         const toy = {
-            url: url,
             title: $('.detail h1 span').text().trim(),
             description: $('#section-description > div > div > div > div').text().trim(),
-            img: $('.magnifier-image img').attr('src'),
+            img: `media/toys/${ i }.jpg`,
+            category: 'toys',
             price: price,
             options: optResult,
         };
 
-        console.log(toy)
+        const imgUrl = $('.magnifier-image img').attr('src');
+        const imgView = await page.goto(imgUrl);
+        const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
+        const imgPath = `./media/${ toy.category }/${ imgName }`;
+        if (!fs.existsSync(`./media/${ toy.category }/`)){
+            fs.mkdirSync(`./media/${ toy.category }/`);
+        }
+        fs.writeFile(imgPath, await imgView.buffer(), function (err) {
+            if (err) {
+                return console.log(err);
+            }
+        });
+        
+
+        const listingModel = new Listing(toy);
+        listingModel.save();
 
         result.push(toy);
     }
@@ -78,13 +98,19 @@ async function sleep(ms) {
 }
 
 async function main() {
+    await connectToMongoDB();
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     const list = await scrapeList(page);
     const carts = await scrapeCart(page, list);
 
-    console.log(carts);
+    browser.close();
+
+    const json = JSON.stringify(carts);
+    fs.writeFile('toys.json', json, 'utf8', err => {
+        if(err) console.error(err);
+    });
 }
 
 main();
