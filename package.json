@@ -4,7 +4,7 @@
   "description": "Веб-скрапер для сбора тестовых данных",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watchAll"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/jtwbm/web-scraper#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
+    "jest": "^24.9.0",
     "mongoose": "^5.8.0",
     "puppeteer": "^2.0.0",
     "request": "^2.88.0",

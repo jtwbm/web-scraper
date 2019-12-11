@@ -4,6 +4,10 @@ const mongoose = require('mongoose');
 const fs = require("fs");
 const Listing = require('./model/Listing');
 
+export function add(a, b) {
+    return a + b;
+}
+
 
 async function connectToMongoDB() {
     await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -99,7 +103,7 @@ async function sleep(ms) {
 }
 
 async function main() {
-    await connectToMongoDB();
+    // await connectToMongoDB();
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
@@ -109,7 +113,7 @@ async function main() {
     browser.close();
 
     const json = JSON.stringify(carts);
-    fs.writeFile('toys.json', json, 'utf8', err => {
+    fs.writeFile('jsons/toys.json', json, 'utf8', err => {
         if(err) console.error(err);
     });
 }
