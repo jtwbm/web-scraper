@@ -25,5 +25,8 @@
     "puppeteer": "^2.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.5"
+  },
+  "devDependencies": {
+    "djv": "^2.1.3-alpha.0"
   }
 }

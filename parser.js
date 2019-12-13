@@ -81,9 +81,8 @@ async function getImg(imgUrl, category, mediaFolder) {
     const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
     const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;
 
-    if (!fs.existsSync(`./${ mediaFolder }/${ category }/`)) {
-        fs.mkdirSync(`./${ mediaFolder }/${ category }/`);
-    }
+    mkDir(`./${ mediaFolder }/${ category }/`);
+
     fs.writeFile(imgPath, await imgView.buffer(), function (err) {
         if (err) {
             return console.log(err);
@@ -116,6 +115,31 @@ async function renderTestData() {
     }
 }
 
+async function mkDir(path) {
+    const dirList = path.split('/').filter(str => str.length);
+    let currentPath = '';
+    dirList.forEach(dirName => {
+        currentPath += `${ dirName }/`;
+        if(!fs.existsSync(currentPath)) {
+            fs.mkdirSync(currentPath);
+        }
+    });
+}
+
+async function rmDir(path) {
+    const dirList = path.split('/').filter(str => str.length);
+
+    rm(dirList);
+    
+    function rm(arPath) {
+        if(arPath.length) {
+            fs.rmdirSync(arPath.join('/'));
+            arPath.splice(arPath.length - 1, 1);
+            rm(arPath);
+        }
+    }
+}
+
 async function _sleep(ms) {
     return new Promise((resolve, reject) => setTimeout(resolve, ms));
 }
@@ -127,7 +151,9 @@ module.exports = {
     renderTestData,
     getUrlList,
     getImg,
-    renderJSON
+    renderJSON,
+    mkDir,
+    rmDir
 };
 
 // async function connectToMongoDB() {

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const parser = require('../parser.js');
+const djv = require('djv');
 
 let listHTML;
 let cartHTML;
@@ -57,9 +58,20 @@ it('load image', async () => {
 	fs.rmdirSync('testMedia');
 });
 
+it('make, remove dir', async () => {
+	const path = '/testFolder/test1/test2/test3';
+	await parser.mkDir(path);
+
+	// console.log(fs.readlink('/testFolder/test1/test2/test3'))
+
+	// expect(fs.existsSync('/testFolder/test1/test2/test3')).toBeTruthy();
+
+	await parser.rmDir(path);
+});
+
 // it('render json', async () => {
 // 	const cartDataList = await parser.renderJSON(parser.cartConfig.listUrl);
 // 	parser.renderJSON(cartDataList, 'testJSON', 'test');
 
-	
+
 // });
