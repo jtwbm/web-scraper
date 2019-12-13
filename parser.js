@@ -1,23 +1,97 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
+const fs = require("fs");
 // const mongoose = require('mongoose');
-// const fs = require("fs");
 // const Listing = require('./model/Listing');
 
 const cartConfig = {
-    cartUrl: 'https://www.ozon.ru/context/detail/id/163337167/'
+    listUrl: 'https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/',
+    cartUrl: 'https://www.ozon.ru/context/detail/id/163337167/',
+    imgUrl: 'https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg'
 };
+
+function renderJSON(obj, folder, fileName) {
+    const json = JSON.stringify(obj);
+    fs.writeFile(`${ folder }/${ fileName }.json`, json, 'utf8', err => {
+        if(err) console.error(err);
+    });
+}
+
+async function getCarts(cartUrls) {
+    const result = [];
+    cartUrls.each(async (cartUrl) => {
+        const cartHTML = await getHTML(cartUrl);
+        const cartData = await getCartData(cartHTML);
+        result.push(cartData);
+    });
+    return result;
+}
+
+async function getUrlList(html) {
+    const $ = await cheerio.load(html);
+
+    const result = await $('.widget-search-result-container a').map((index, link) => {
+        const cartUrl = $(link).attr('href');
+        return 'https://www.ozon.ru' + $(link).attr('href').trim();
+    }).get();
+
+    return result;
+}
 
 async function getCartData(html) {
     await _sleep(3000);
 
     const $ = await cheerio.load(html);
+
+    const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
+
+    const optResult = [];
+    $('#section-characteristics dl').each((index, item) => {
+        const titles = $(item).find('dt span').map((index, item) => {
+            return $(item).text();
+        }).get();
+        const values = $(item).find('dd > div > *').map((index, item) => {
+            return $(item).text();
+        }).get();
+
+        titles.forEach((item, index) => {
+            optResult.push({
+                title: item,
+                value: values[index]
+            })
+        });
+    });
+
     const result = {
         title: $('.detail h1 span').text().trim(),
         description: $('#section-description > div > div > div > div').text().trim(),
+        category: 'toys',
+        price,
+        options: optResult,
+        img: await getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
     };
 
     return result;
+}
+
+async function getImg(imgUrl, category, mediaFolder) {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    const imgView = await page.goto(imgUrl);
+    const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
+    const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;
+
+    if (!fs.existsSync(`./${ mediaFolder }/${ category }/`)) {
+        fs.mkdirSync(`./${ mediaFolder }/${ category }/`);
+    }
+    fs.writeFile(imgPath, await imgView.buffer(), function (err) {
+        if (err) {
+            return console.log(err);
+        }
+    });
+    browser.close();
+
+    return imgPath;
 }
 
 async function getHTML(url) {
@@ -30,6 +104,18 @@ async function getHTML(url) {
     return html;
 }
 
+async function renderTestData() {
+    try {
+        const list = await getHTML(cartConfig.listUrl);
+        const cart = await getHTML(cartConfig.cartUrl);
+
+        fs.writeFile('__tests__/list.html', list, 'utf8', (err) => {});
+        fs.writeFile('__tests__/cart.html', cart, 'utf8', (err) => {});
+    } catch(err) {
+        console.log(err);
+    }
+}
+
 async function _sleep(ms) {
     return new Promise((resolve, reject) => setTimeout(resolve, ms));
 }
@@ -37,101 +123,17 @@ async function _sleep(ms) {
 module.exports = {
     cartConfig,
     getCartData,
-    getHTML
+    getHTML,
+    renderTestData,
+    getUrlList,
+    getImg,
+    renderJSON
 };
 
 // async function connectToMongoDB() {
 //     await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 //     console.log('connect to mongoDB');
 // }
-
-// async function scrapeList(page) {
-//     const pageURL = 'https://www.ozon.ru/category/igrushki-i-igry-7108';
-//     await page.goto(pageURL);
-
-//     await sleep(3000);
-
-//     const html = await page.content();
-//     const $ = await cheerio.load(html);
-
-//     const result = await $('.widget-search-result-container a').map((index, link) => {
-//         const cartUrl = $(link).attr('href');
-//         return 'https://www.ozon.ru' + $(link).attr('href');
-//     }).get();
-
-//     console.log('scrapeList done!');
-
-//     return result;
-// }
-
-// async function (page, list) {
-//     let result = [];
-//     for(let i = 0; i < list.length; i++) {
-//         const url = list[i];
-//         await page.goto(url);
-//         const html = await page.content();
-
-//         await sleep(1000);
-
-//         const $ = await cheerio.load(html);
-
-//         let optResult = [];
-//         $('#section-characteristics dl').each((index, item) => {
-//             const titles = $(item).find('dt span').map((index, item) => {
-//                 return $(item).text();
-//             }).get();
-//             const values = $(item).find('dd > div > *').map((index, item) => {
-//                 return $(item).text();
-//             }).get();
-
-//             titles.forEach((item, index) => {
-//                 optResult.push({
-//                     title: item,
-//                     value: values[index]
-//                 })
-//             });
-//         });
-
-//         const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
-
-//         const toy = {
-//             title: $('.detail h1 span').text().trim(),
-//             description: $('#section-description > div > div > div > div').text().trim(),
-//             category: 'toys',
-//             img: await getImg($('.magnifier-image img').attr('src'), 'toys', page),
-//             price: price,
-//             options: optResult,
-//         };
-
-//         // const listingModel = new Listing(toy);
-//         // listingModel.save();
-
-//         result.push(toy);
-//     }
-
-//     console.log('scrapeCart done!');
-
-//     return result;
-// };
-
-
-
-// async function getImg(imgUrl, category, page) {
-//     const imgView = await page.goto(imgUrl);
-//     const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
-//     const imgPath = `./media/${ category }/${ imgName }`;
-//     if (!fs.existsSync(`./media/${ category }/`)){
-//         fs.mkdirSync(`./media/${ category }/`);
-//     }
-//     fs.writeFile(imgPath, await imgView.buffer(), function (err) {
-//         if (err) {
-//             return console.log(err);
-//         }
-//     });
-//     return imgPath;
-// }
-
-
 
 // async function main() {
 //     // await connectToMongoDB();

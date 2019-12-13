@@ -3,18 +3,8 @@ const parser = require('./parser.js');
 
 
 (async () => {
-	const html = await parser.getHTML('https://www.ozon.ru/context/detail/id/150436579/');
-	const data = await parser.getCartData(html);
-	console.log(data);
+	const listHTML = await parser.getHTML('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
+	const cartHTML = await parser.getHTML('https://www.ozon.ru/context/detail/id/150436579/');
+	const cartData = await parser.getCartData(cartHTML);
+	const cartUrls = await parser.getUrlList(listHTML);
 })();
-	
-// (async function() {
-// 	try {
-
-// 		html = await parser.getHTML(parser.cartConfig.cartUrl);
-// 		fs.writeFile('__tests__/test.html', html, 'utf8', (err) => {});
-
-// 	} catch(err) {
-// 		console.log(err);
-// 	}
-// })();
