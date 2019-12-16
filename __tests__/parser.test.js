@@ -59,19 +59,23 @@ it('load image', async () => {
 });
 
 it('make, remove dir', async () => {
-	const path = '/testFolder/test1/test2/test3';
+	const path = 'testFolder/test1/test2/test3';
 	await parser.mkDir(path);
-
-	// console.log(fs.readlink('/testFolder/test1/test2/test3'))
-
-	// expect(fs.existsSync('/testFolder/test1/test2/test3')).toBeTruthy();
+	expect(fs.existsSync(path)).toBeTruthy();
 
 	await parser.rmDir(path);
+	expect(!fs.existsSync('testFolder')).toBeTruthy();
 });
 
-// it('render json', async () => {
-// 	const cartDataList = await parser.renderJSON(parser.cartConfig.listUrl);
-// 	parser.renderJSON(cartDataList, 'testJSON', 'test');
+it('render json', async () => {
+	const listOfLinks = await parser.getUrlList(listHTML);
+	await parser.renderJSON(listOfLinks, 'testJSON', 'test');
 
+	expect(fs.existsSync('testJSON/test.json')).toBeTruthy();
+	parser.rmFile('testJSON/test.json');
+	await parser.rmDir('testJSON');
+});
 
-// });
+// rm file
+// add file
+// valid json

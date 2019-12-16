@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const fs = require("fs");
+const rimraf = require("rimraf");
 // const mongoose = require('mongoose');
 // const Listing = require('./model/Listing');
 
@@ -10,16 +11,16 @@ const cartConfig = {
     imgUrl: 'https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg'
 };
 
-function renderJSON(obj, folder, fileName) {
-    const json = JSON.stringify(obj);
-    fs.writeFile(`${ folder }/${ fileName }.json`, json, 'utf8', err => {
-        if(err) console.error(err);
-    });
+
+async function renderJSON(data, path, fileName) {
+    const json = JSON.stringify(data);
+    await mkDir(path);
+    fs.writeFileSync(`${ path }/${ fileName }.json`, json, 'utf8', err => console.log(err));
 }
 
 async function getCarts(cartUrls) {
     const result = [];
-    cartUrls.each(async (cartUrl) => {
+    cartUrls.forEach(async (cartUrl) => {
         const cartHTML = await getHTML(cartUrl);
         const cartData = await getCartData(cartHTML);
         result.push(cartData);
@@ -108,22 +109,21 @@ async function renderTestData() {
         const list = await getHTML(cartConfig.listUrl);
         const cart = await getHTML(cartConfig.cartUrl);
 
-        fs.writeFile('__tests__/list.html', list, 'utf8', (err) => {});
-        fs.writeFile('__tests__/cart.html', cart, 'utf8', (err) => {});
+        fs.writeFileSync('__tests__/list.html', list, 'utf8', (err) => console.log(err));
+        fs.writeFileSync('__tests__/cart.html', cart, 'utf8', (err) => console.log(err));
     } catch(err) {
         console.log(err);
     }
 }
 
+function rmFile(path) {
+    if(fs.existsSync(path)) {
+        fs.unlinkSync(path, err => console.log(err));
+    }
+}
+
 async function mkDir(path) {
-    const dirList = path.split('/').filter(str => str.length);
-    let currentPath = '';
-    dirList.forEach(dirName => {
-        currentPath += `${ dirName }/`;
-        if(!fs.existsSync(currentPath)) {
-            fs.mkdirSync(currentPath);
-        }
-    });
+    fs.mkdirSync(path, { recursive: true }, (err) => console.log(err));
 }
 
 async function rmDir(path) {
@@ -132,7 +132,7 @@ async function rmDir(path) {
     rm(dirList);
     
     function rm(arPath) {
-        if(arPath.length) {
+        if(arPath.length && !fs.existsSync(arPath)) {
             fs.rmdirSync(arPath.join('/'));
             arPath.splice(arPath.length - 1, 1);
             rm(arPath);
@@ -151,9 +151,11 @@ module.exports = {
     renderTestData,
     getUrlList,
     getImg,
+    getCarts,
     renderJSON,
     mkDir,
-    rmDir
+    rmDir,
+    rmFile
 };
 
 // async function connectToMongoDB() {
