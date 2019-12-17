@@ -1,6 +1,5 @@
 const fs = require('fs');
 const parser = require('../parser.js');
-const djv = require('djv');
 
 let listHTML;
 let cartHTML;
@@ -92,6 +91,3 @@ it('add/remove file', async () => {
 	await parser.rmFile(filePath);
 	await parser.rmDir('testFile');
 });
-
-
-// valid json
