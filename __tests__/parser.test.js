@@ -5,9 +5,7 @@ let listHTML;
 let cartHTML;
 
 beforeAll(async done => {
-	if(!fs.existsSync('__tests__/list.html') && !fs.existsSync('__tests__/cart.html')) {
-		await parser.renderTestData();
-	}
+	await parser.renderTestData();
 
 	listHTML = fs.readFileSync('__tests__/list.html', 'utf8', (err, data) => {});
 	cartHTML = fs.readFileSync('__tests__/cart.html', 'utf8', (err, data) => {});
@@ -89,5 +87,5 @@ it('add/remove file', async () => {
 	expect(fs.readFileSync(filePath, 'utf8')).toBe(fileData);
 
 	await parser.rmFile(filePath);
-	await parser.rmDir('testFile');
+	await parser.rmDir('testFile/');
 });

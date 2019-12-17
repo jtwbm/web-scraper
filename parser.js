@@ -8,8 +8,35 @@ const rimraf = require("rimraf");
 const cartConfig = {
     listUrl: 'https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/',
     cartUrl: 'https://www.ozon.ru/context/detail/id/163337167/',
-    imgUrl: 'https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg'
+    imgUrl: 'https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg',
+
+    /******************************************/
+    list: {
+        url: 'https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/', // url страницы со списком товаров
+        el: '.widget-search-result-container a', // css класс ссылки на детальную страницу товара
+    },
+    json: {
+        folder: 'my-jsons', // папка, куда будут складываться json с данными
+        name: 'toys' // toys.json
+    },
 };
+
+class Parser {
+    constructor(config = {}) {
+        this.list = config.list || {};
+        this.json = config.json || {};
+    }
+
+    async getHTML(url) {
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.goto(url);
+        const html = await page.content();
+        browser.close();
+
+        return html;
+    }
+}
 
 
 async function renderJSON(data, path, fileName) {
@@ -95,13 +122,7 @@ async function getImg(imgUrl, category, mediaFolder) {
 }
 
 async function getHTML(url) {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.goto(url);
-    const html = await page.content();
-    browser.close();
-
-    return html;
+    return await new Parser().getHTML(url);
 }
 
 async function renderTestData() {
@@ -164,7 +185,7 @@ module.exports = {
     mkDir,
     rmDir,
     rmFile,
-    addFile
+    addFile,
 };
 
 // async function connectToMongoDB() {
