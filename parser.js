@@ -15,7 +15,7 @@ const cartConfig = {
 async function renderJSON(data, path, fileName) {
     const json = JSON.stringify(data);
     await mkDir(path);
-    fs.writeFileSync(`${ path }/${ fileName }.json`, json, 'utf8', err => console.log(err));
+    await addFile(`${ path }/${ fileName }.json`, json);
 }
 
 async function getCarts(cartUrls) {
@@ -109,14 +109,22 @@ async function renderTestData() {
         const list = await getHTML(cartConfig.listUrl);
         const cart = await getHTML(cartConfig.cartUrl);
 
-        fs.writeFileSync('__tests__/list.html', list, 'utf8', (err) => console.log(err));
-        fs.writeFileSync('__tests__/cart.html', cart, 'utf8', (err) => console.log(err));
+        await addFile('__tests__/list.html', list);
+        await addFile('__tests__/cart.html', cart);
     } catch(err) {
         console.log(err);
     }
 }
 
-function rmFile(path) {
+async function addFile(path, data = '') {
+    const fileName = path.split('/').pop();
+    if(!fs.existsSync(path)) {
+        mkDir(path.replace(fileName, ''));
+        fs.writeFileSync(path, data, 'utf8', (err) => console.log(err));
+    }
+}
+
+async function rmFile(path) {
     if(fs.existsSync(path)) {
         fs.unlinkSync(path, err => console.log(err));
     }
@@ -155,7 +163,8 @@ module.exports = {
     renderJSON,
     mkDir,
     rmDir,
-    rmFile
+    rmFile,
+    addFile
 };
 
 // async function connectToMongoDB() {

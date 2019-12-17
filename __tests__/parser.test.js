@@ -72,10 +72,26 @@ it('render json', async () => {
 	await parser.renderJSON(listOfLinks, 'testJSON', 'test');
 
 	expect(fs.existsSync('testJSON/test.json')).toBeTruthy();
-	parser.rmFile('testJSON/test.json');
+
+	const jsonData = JSON.stringify(JSON.parse(fs.readFileSync('testJSON/test.json')));
+
+	expect(jsonData).toBe(JSON.stringify(listOfLinks));
+	await parser.rmFile('testJSON/test.json');
 	await parser.rmDir('testJSON');
 });
 
-// rm file
-// add file
+it('add/remove file', async () => {
+	const filePath = 'testFile/file.txt';
+	const fileData = 'my test data';
+
+	await parser.addFile(filePath, fileData);
+
+	expect(fs.existsSync(filePath)).toBeTruthy();
+	expect(fs.readFileSync(filePath, 'utf8')).toBe(fileData);
+
+	await parser.rmFile(filePath);
+	await parser.rmDir('testFile');
+});
+
+
 // valid json
