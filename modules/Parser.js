@@ -12,19 +12,21 @@ module.exports = class Parser {
         this.file = new File();
     }
 
-    async renderData() {
-        // await connectToMongoDB();
-        const page = await this.page();
-        const list = await scrapeList(page);
-        const carts = await scrapeCart(page, list);
+    // написать общий метод для рендера тестовых данных
+    // async renderData() {
+    //     // await connectToMongoDB();
+    //     const page = await this.page();
+    //     const list = await scrapeList(page);
+    //     const carts = await scrapeCart(page, list);
 
-        const json = JSON.stringify(carts);
-        fs.writeFile('jsons/toys.json', json, 'utf8', err => {
-            if(err) console.error(err);
-        });
-    }
+    //     const json = JSON.stringify(carts);
+    //     fs.writeFile('jsons/toys.json', json, 'utf8', err => {
+    //         if(err) console.error(err);
+    //     });
+    // }
 
     async page(url = '') {
+        // объединить с getHTML, возвращать файл или html
         const browser = await puppeteer.launch({ headless: true });
         let page = await browser.newPage();
 
@@ -46,6 +48,7 @@ module.exports = class Parser {
     }
 
     async getUrlList(html) {
+        // добавить конфиг
         const $ = await cheerio.load(html);
 
         const result = await $('.widget-search-result-container a').map((index, link) => {
@@ -57,6 +60,7 @@ module.exports = class Parser {
     }
 
     async getCartData(html) {
+        // добавить конфиг
         const $ = await cheerio.load(html);
 
         const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
@@ -91,7 +95,7 @@ module.exports = class Parser {
     }
 
     async getImg(imgUrl, category, mediaFolder) {
-
+        // разбить получение картинки и запись в ФС
         const imgView = await this.page(imgUrl);
         const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
         const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;

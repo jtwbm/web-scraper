@@ -28,6 +28,7 @@ module.exports = class File {
     }
 
     async rmDir(path) {
+        // если стоит св-во recursive, удалять файлы, если есть в папке, если нет - выводить ошибку
         const dirList = path.split('/').filter(str => str.length);
 
         rm(dirList);
