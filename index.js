@@ -1,5 +1,5 @@
 const fs = require('fs');
-const parser = require('./parser.js');
+const parser = require('./modules/parser.js');
 
 
 (async () => {

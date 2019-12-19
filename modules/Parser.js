@@ -2,29 +2,14 @@ const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const fs = require("fs");
 const rimraf = require("rimraf");
+const File = require('./File.js');
 // const mongoose = require('mongoose');
 // const Listing = require('./model/Listing');
 
-const cartConfig = {
-    listUrl: 'https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/',
-    cartUrl: 'https://www.ozon.ru/context/detail/id/163337167/',
-    imgUrl: 'https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg',
 
-    /******************************************/
-    list: {
-        url: 'https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/', // url страницы со списком товаров
-        el: '.widget-search-result-container a', // css класс ссылки на детальную страницу товара
-    },
-    json: {
-        folder: 'my-jsons', // папка, куда будут складываться json с данными
-        name: 'toys' // toys.json
-    },
-};
-
-class Parser {
+module.exports = class Parser {
     constructor(config = {}) {
-        this.list = config.list || {};
-        this.json = config.json || {};
+        this.file = new File();
     }
 
     async getHTML(url) {
@@ -76,7 +61,7 @@ class Parser {
             category: 'toys',
             price,
             options: optResult,
-            img: await getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
+            img: await this.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
         };
 
         return result;
@@ -89,7 +74,7 @@ class Parser {
         const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
         const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;
 
-        mkDir(`./${ mediaFolder }/${ category }/`);
+        this.file.mkDir(`./${ mediaFolder }/${ category }/`);
 
         fs.writeFile(imgPath, await imgView.buffer(), function (err) {
             if (err) {
@@ -102,31 +87,13 @@ class Parser {
     }
 }
 
-async function getUrlList(html) {
-    return await new Parser().getUrlList(html);
-}
-
-async function getHTML(url) {
-    return await new Parser().getHTML(url);
-}
-
-async function getCartData(html) {
-    return new Parser().getCartData(html);
-}
-
-async function getImg(imgUrl, category, mediaFolder) {
-    return new Parser().getImg(imgUrl, category, mediaFolder);
-}
-
-
-
 
 
 
 // async function renderTestData() {
 //     try {
-//         const list = await getHTML(cartConfig.listUrl);
-//         const cart = await getHTML(cartConfig.cartUrl);
+//         const list = await getHTML('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
+//         const cart = await getHTML('https://www.ozon.ru/context/detail/id/163337167/');
 
 //         await addFile('__tests__/list.html', list);
 //         await addFile('__tests__/cart.html', cart);
@@ -136,23 +103,9 @@ async function getImg(imgUrl, category, mediaFolder) {
 // }
 
 
-
-
-
-
-
 // async function _sleep(ms) {
 //     return new Promise((resolve, reject) => setTimeout(resolve, ms));
 // }
-
-module.exports = {
-    cartConfig,
-    getCartData,
-    getHTML,
-    // renderTestData,
-    getUrlList,
-    getImg,
-};
 
 // async function connectToMongoDB() {
 //     await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });

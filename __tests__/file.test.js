@@ -1,5 +1,5 @@
 const fs = require('fs');
-const File = require('../file.js');
+const File = require('../modules/File.js');
 
 const f = new File();
 
