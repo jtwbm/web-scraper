@@ -12,12 +12,35 @@ module.exports = class Parser {
         this.file = new File();
     }
 
-    async getHTML(url) {
+    async renderData() {
+        // await connectToMongoDB();
+        const page = await this.page();
+        const list = await scrapeList(page);
+        const carts = await scrapeCart(page, list);
+
+        const json = JSON.stringify(carts);
+        fs.writeFile('jsons/toys.json', json, 'utf8', err => {
+            if(err) console.error(err);
+        });
+    }
+
+    async page(url = '') {
         const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-        await page.goto(url);
-        const html = await page.content();
+        let page = await browser.newPage();
+
+        if(url.length) {
+            page = await page.goto(url);
+            return { browser, page };
+        }
+
         browser.close();
+
+        return page;
+    }
+
+    async getHTML(url) {
+        const page = await this.page(url);
+        const html = await page.content();
 
         return html;
     }
@@ -68,64 +91,26 @@ module.exports = class Parser {
     }
 
     async getImg(imgUrl, category, mediaFolder) {
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-        const imgView = await page.goto(imgUrl);
+
+        const imgView = await this.page(imgUrl);
         const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
         const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;
 
         this.file.mkDir(`./${ mediaFolder }/${ category }/`);
 
-        fs.writeFile(imgPath, await imgView.buffer(), function (err) {
+        fs.writeFile(imgPath, await imgView.page.buffer(), function (err) {
             if (err) {
                 return console.log(err);
             }
         });
-        browser.close();
+
+        imgView.browser.close();
 
         return imgPath;
     }
+
+    // async connectToMongoDB() {
+    //     await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
+    //     console.log('connected to mongoDB');
+    // }
 }
-
-
-
-
-// async function renderTestData() {
-//     try {
-//         const list = await getHTML('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
-//         const cart = await getHTML('https://www.ozon.ru/context/detail/id/163337167/');
-
-//         await addFile('__tests__/list.html', list);
-//         await addFile('__tests__/cart.html', cart);
-//     } catch(err) {
-//         console.log(err);
-//     }
-// }
-
-
-// async function _sleep(ms) {
-//     return new Promise((resolve, reject) => setTimeout(resolve, ms));
-// }
-
-// async function connectToMongoDB() {
-//     await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
-//     console.log('connect to mongoDB');
-// }
-
-// async function main() {
-//     // await connectToMongoDB();
-//     const browser = await puppeteer.launch({ headless: true });
-//     const page = await browser.newPage();
-
-//     const list = await scrapeList(page);
-//     const carts = await scrapeCart(page, list);
-
-//     browser.close();
-
-//     const json = JSON.stringify(carts);
-//     fs.writeFile('jsons/toys.json', json, 'utf8', err => {
-//         if(err) console.error(err);
-//     });
-// }
-
-// main();

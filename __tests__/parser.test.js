@@ -1,13 +1,8 @@
 const fs = require('fs');
 const Parser = require('../modules/Parser.js');
 
-// запихнуть в beforeAll
-// ??? https://www.codota.com/code/javascript/functions/jest/beforeAll
-// parser.renderTestData();
-
 const listHTML = fs.readFileSync('__tests__/list.html', 'utf8', err => console.log(err));
 const cartHTML = fs.readFileSync('__tests__/cart.html', 'utf8', err => console.log(err));
-
 const parser = new Parser();
 
 it('list of links', async () => {
@@ -40,7 +35,7 @@ it('cart data', async () => {
 
 it('load image', async () => {
 	const imgUrlAfterParsing = await parser.getImg('https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg', 'testMedia', '');
-	const imgExists = fs.existsSync(imgUrlAfterParsing);
+	const imgExists = await fs.existsSync(imgUrlAfterParsing);
 
 	expect(typeof imgUrlAfterParsing).toBe('string');
 	expect(imgExists).toBeTruthy();
