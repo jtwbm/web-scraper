@@ -44,4 +44,3 @@ it('load image', async () => {
 
 	await f.rmDir('testMedia', { recursive: true });
 });
-

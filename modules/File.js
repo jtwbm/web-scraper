@@ -24,7 +24,9 @@ module.exports = class File {
     }
 
     mkDir(path) {
-        fs.mkdirSync(path, { recursive: true }, (err) => console.log(err));
+        if(!fs.existsSync(path)) {
+            fs.mkdirSync(path, { recursive: true }, (err) => console.log(err));
+        }
     }
 
     async rmDir(path, config = { recursive: false }) {

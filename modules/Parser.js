@@ -11,20 +11,7 @@ module.exports = class Parser {
     constructor(config = {}) {
         this.file = new File();
     }
-
-    // написать общий метод для рендера тестовых данных
-    // async renderData() {
-    //     // await connectToMongoDB();
-    //     const page = await this.page();
-    //     const list = await scrapeList(page);
-    //     const carts = await scrapeCart(page, list);
-
-    //     const json = JSON.stringify(carts);
-    //     fs.writeFile('jsons/toys.json', json, 'utf8', err => {
-    //         if(err) console.error(err);
-    //     });
-    // }
-
+    
     async page(url = '', isFile = false) {
         const browser = await puppeteer.launch({ headless: true });
         let page = await browser.newPage();
@@ -49,7 +36,7 @@ module.exports = class Parser {
 
     async getUrlList(html) {
         // добавить конфиг
-        const $ = await cheerio.load(html);
+        const $ = await this.$(html);
 
         const result = await $('.widget-search-result-container a').map((index, link) => {
             const cartUrl = $(link).attr('href');
@@ -61,7 +48,7 @@ module.exports = class Parser {
 
     async getCartData(html) {
         // добавить конфиг
-        const $ = await cheerio.load(html);
+        const $ = await this.$(html);
 
         const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
 
@@ -82,6 +69,7 @@ module.exports = class Parser {
             });
         });
 
+
         const result = {
             title: $('.detail h1 span').text().trim(),
             description: $('#section-description > div > div > div > div').text().trim(),
@@ -100,7 +88,7 @@ module.exports = class Parser {
         const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
         const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;
 
-        this.file.mkDir(`./${ mediaFolder }/${ category }/`);
+        await this.file.mkDir(`./${ mediaFolder }/${ category }/`);
 
         fs.writeFileSync(imgPath, data, function (err) {
             if (err) {
@@ -109,6 +97,10 @@ module.exports = class Parser {
         });
 
         return imgPath;
+    }
+
+    async $(html) {
+        return await cheerio.load(html);
     }
 
     async _sleep(ms) {
