@@ -27,9 +27,15 @@ module.exports = class File {
         fs.mkdirSync(path, { recursive: true }, (err) => console.log(err));
     }
 
-    async rmDir(path) {
+    async rmDir(path, config = { recursive: false }) {
         // если стоит св-во recursive, удалять файлы, если есть в папке, если нет - выводить ошибку
         const dirList = path.split('/').filter(str => str.length);
+
+        if(dirList.length && config.recursive) {
+            fs.readdirSync(path).forEach(file => {
+                this.rmFile(`${ path }/${ file }`);
+            });
+        }
 
         rm(dirList);
         

@@ -25,12 +25,12 @@ it('add/remove file', async () => {
 	const fileData = 'my test data';
 
 	await f.addFile(filePath, fileData);
+	await f.addFile('testFile/test.txt', '');
 
 	expect(fs.existsSync(filePath)).toBeTruthy();
 	expect(fs.readFileSync(filePath, 'utf8')).toBe(fileData);
 
-	await f.rmFile(filePath);
-	await f.rmDir('testFile/');
+	await f.rmDir('testFile', { recursive: true });
 });
 
 it('make, remove dir', async () => {

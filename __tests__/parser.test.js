@@ -1,9 +1,11 @@
 const fs = require('fs');
 const Parser = require('../modules/Parser.js');
+const File = require('../modules/File.js');
 
 const listHTML = fs.readFileSync('__tests__/list.html', 'utf8', err => console.log(err));
 const cartHTML = fs.readFileSync('__tests__/cart.html', 'utf8', err => console.log(err));
 const parser = new Parser();
+const f = new File();
 
 it('list of links', async () => {
 	const urlList = await parser.getUrlList(listHTML);
@@ -40,11 +42,6 @@ it('load image', async () => {
 	expect(typeof imgUrlAfterParsing).toBe('string');
 	expect(imgExists).toBeTruthy();
 
-	fs.unlinkSync(imgUrlAfterParsing, (err) => {
-	  	if (err) throw err;
-	  	console.log(`successfully deleted ${ imgExists }`);
-	});
-
-	fs.rmdirSync('testMedia');
+	await f.rmDir('testMedia', { recursive: true });
 });
 
