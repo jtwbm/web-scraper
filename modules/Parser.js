@@ -17,7 +17,7 @@ module.exports = class Parser {
         let page = await browser.newPage();
 
         if(url.length) {
-            const view = await page.goto(url);
+            const view = await page.goto(url, {waitUntil: 'load', timeout: 0});
 
             if(isFile) {
                 const file = await view.buffer();
