@@ -31,56 +31,9 @@ module.exports = class Parser {
         return page;
     }
 
-    async getData(html, options = []) {
-        // сделать один общий коллбек для страницы в конфиге
+    async getData(html, callback) {
         const $ = await this.$(html);
-        const result = [];
-
-        await options.forEach(async config => {
-            const data = await $(config.el).map((index, link) => {
-                return config.callback.call(null, link, $);
-            }).get();
-
-            result.push(data);
-        });
-
-        return result;
-    }
-
-    async getCartData(html) {
-        // добавить конфиг
-        const $ = await this.$(html);
-
-        const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
-
-        const optResult = [];
-        $('#section-characteristics dl').each((index, item) => {
-            const titles = $(item).find('dt span').map((index, item) => {
-                return $(item).text();
-            }).get();
-            const values = $(item).find('dd > div > *').map((index, item) => {
-                return $(item).text();
-            }).get();
-
-            titles.forEach((item, index) => {
-                optResult.push({
-                    title: item,
-                    value: values[index]
-                })
-            });
-        });
-
-
-        const result = {
-            title: $('.detail h1 span').text().trim(),
-            description: $('#section-description > div > div > div > div').text().trim(),
-            category: 'toys',
-            price,
-            options: optResult,
-            img: await this.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
-        };
-
-        return result;
+        return await callback.call(null, $);
     }
 
     async getImg(imgUrl, category, mediaFolder) {

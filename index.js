@@ -5,62 +5,13 @@ const Parser = require('./modules/Parser.js');
 	const parser = new Parser();
 	const listHTML = await parser.page('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
 
+	const arCartUrls = await parser.getData(listHTML, $ => {
+		return $('.widget-search-result-container a').map((index, link) => {
+			return 'https://www.ozon.ru' + $(link).attr('href').trim();
+		}).get();
+	});
 
-	const listOptions = [
-        {
-            el: '.widget-search-result-container a',
-            callback: (link, $) => {
-                return 'https://www.ozon.ru' + $(link).attr('href').trim();
-            }
-        }
-    ];
-	const arCartUrls = await parser.getData(listHTML, listOptions);
-
-	const cartOptions = [
-		{
-			key: 'title',
-			el: '.detail h1 span',
-			callback: (title, $) => {
-				return $(title).text().trim();
-			}
-		},
-		{
-			key: 'description',
-			el: '#section-description > div > div > div > div',
-			callback: (desc, $) => {
-				return $(desc).text().trim();
-			}
-		},
-		{
-			key: 'category',
-			value: 'toys'
-		},
-		{
-			key: 'price',
-			el: '.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child',
-			callback: (price, $) => {
-				return Number($(price).text().replace(/[ \s₽]/gi, '').trim());
-			}
-		},
-		{
-			key: 'options',
-			el: '#section-characteristics dl',
-			callback: (attr, $) => {
-				// нужен index
-				return '123'
-			}
-		},
-		{
-			key: 'img',
-			el: '.magnifier-image img',
-			callback: async (img, $) => {
-				return await parser.getImg($(img).attr('src'), 'toys', 'media');
-			}
-		}
-	];
-
-
-	main(arCartUrls[0], data => {
+	main(arCartUrls, data => {
 		console.log(data)
 	});
 
@@ -78,7 +29,38 @@ const Parser = require('./modules/Parser.js');
 				(async () => {
 					const html = await parser.page(urls[index]);
 					await parser._sleep(1000);
-					const data = await parser.getCartData(html);
+					const data = await parser.getData(html, $ => {
+						const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
+
+				        const optResult = [];
+				        $('#section-characteristics dl').each((index, item) => {
+				            const titles = $(item).find('dt span').map((index, item) => {
+				                return $(item).text();
+				            }).get();
+				            const values = $(item).find('dd > div > *').map((index, item) => {
+				                return $(item).text();
+				            }).get();
+
+				            titles.forEach((item, index) => {
+				                optResult.push({
+				                    title: item,
+				                    value: values[index]
+				                })
+				            });
+				        });
+
+
+				        const result = {
+				            title: $('.detail h1 span').text().trim(),
+				            description: $('#section-description > div > div > div > div').text().trim(),
+				            category: 'toys',
+				            price,
+				            options: optResult,
+				            // img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
+				        };
+
+				        return result;
+					});
 					console.log(data)
 					result.push(data);
 					resolve(index + 1);
