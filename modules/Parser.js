@@ -3,9 +3,6 @@ const cheerio = require('cheerio');
 const fs = require("fs");
 const rimraf = require("rimraf");
 const File = require('./File.js');
-// const mongoose = require('mongoose');
-// const Listing = require('./model/Listing');
-
 
 module.exports = class Parser {
     constructor(config = {}) {
@@ -106,9 +103,4 @@ module.exports = class Parser {
     async _sleep(ms) {
         return new Promise((resolve, reject) => setTimeout(resolve, ms));
     }
-
-    // async connectToMongoDB() {
-    //     await mongoose.connect('mongodb+srv://scraper-admin:<pass>@scraper-cluster-orbiu.mongodb.net/toys?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
-    //     console.log('connected to mongoDB');
-    // }
 }
