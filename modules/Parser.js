@@ -31,14 +31,17 @@ module.exports = class Parser {
         return page;
     }
 
-    async getUrlList(html) {
-        // добавить конфиг
+    async getData(html, options = []) {
         const $ = await this.$(html);
+        const result = [];
 
-        const result = await $('.widget-search-result-container a').map((index, link) => {
-            const cartUrl = $(link).attr('href');
-            return 'https://www.ozon.ru' + $(link).attr('href').trim();
-        }).get();
+        await options.forEach(async config => {
+            const data = await $(config.el).map((index, link) => {
+                return config.callback.call(null, link, $);
+            }).get();
+
+            result.push(data);
+        });
 
         return result;
     }

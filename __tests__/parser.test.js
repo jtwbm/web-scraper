@@ -8,13 +8,24 @@ const parser = new Parser();
 const f = new File();
 
 it('list of links', async () => {
-	const urlList = await parser.getUrlList(listHTML);
+	// убрать [0]!
+	const listOptions = [
+        {
+            el: '.widget-search-result-container a',
+            callback: (link, $) => {
+                return 'https://www.ozon.ru' + $(link).attr('href').trim();
+            }
+        }
+    ];
+
+	const urlList = await parser.getData(listHTML, listOptions);
+
 	const urlRegex = /^https?:\/\/[\w\d\/\?@:%._\+~#=&]{3,}$/;
 
-	expect(Array.isArray(urlList)).toBeTruthy();
-	expect(urlList.length).not.toBe(0);
-	expect(urlList.every(url => typeof url === 'string')).toBeTruthy();
-	expect(urlList.every(url => urlRegex.test(url))).toBeTruthy();
+	expect(Array.isArray(urlList[0])).toBeTruthy();
+	expect(urlList[0].length).not.toBe(0);
+	expect(urlList[0].every(url => typeof url === 'string')).toBeTruthy();
+	expect(urlList[0].every(url => urlRegex.test(url))).toBeTruthy();
 });
 
 it('cart data', async () => {

@@ -4,7 +4,17 @@ const Parser = require('./modules/Parser.js');
 (async () => {
 	const parser = new Parser();
 	const listHTML = await parser.page('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
-	const arCartUrls = await parser.getUrlList(listHTML);
+
+
+	const listOptions = [
+        {
+            el: '.widget-search-result-container a',
+            callback: (link, $) => {
+                return 'https://www.ozon.ru' + $(link).attr('href').trim();
+            }
+        }
+    ];
+	const arCartUrls = await parser.getData(listHTML, listOptions);
 
 
 	main(arCartUrls, data => {
