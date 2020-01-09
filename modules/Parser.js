@@ -32,6 +32,7 @@ module.exports = class Parser {
     }
 
     async getData(html, options = []) {
+        // сделать один общий коллбек для страницы в конфиге
         const $ = await this.$(html);
         const result = [];
 

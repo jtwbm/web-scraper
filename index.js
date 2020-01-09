@@ -16,8 +16,51 @@ const Parser = require('./modules/Parser.js');
     ];
 	const arCartUrls = await parser.getData(listHTML, listOptions);
 
+	const cartOptions = [
+		{
+			key: 'title',
+			el: '.detail h1 span',
+			callback: (title, $) => {
+				return $(title).text().trim();
+			}
+		},
+		{
+			key: 'description',
+			el: '#section-description > div > div > div > div',
+			callback: (desc, $) => {
+				return $(desc).text().trim();
+			}
+		},
+		{
+			key: 'category',
+			value: 'toys'
+		},
+		{
+			key: 'price',
+			el: '.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child',
+			callback: (price, $) => {
+				return Number($(price).text().replace(/[ \s₽]/gi, '').trim());
+			}
+		},
+		{
+			key: 'options',
+			el: '#section-characteristics dl',
+			callback: (attr, $) => {
+				// нужен index
+				return '123'
+			}
+		},
+		{
+			key: 'img',
+			el: '.magnifier-image img',
+			callback: async (img, $) => {
+				return await parser.getImg($(img).attr('src'), 'toys', 'media');
+			}
+		}
+	];
 
-	main(arCartUrls, data => {
+
+	main(arCartUrls[0], data => {
 		console.log(data)
 	});
 
