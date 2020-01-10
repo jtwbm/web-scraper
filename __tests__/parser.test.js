@@ -43,7 +43,6 @@ it('cart data', async () => {
             });
         });
 
-
         const result = {
             title: $('.detail h1 span').text().trim(),
             description: $('#section-description > div > div > div > div').text().trim(),
@@ -66,7 +65,7 @@ it('cart data', async () => {
 	expect(typeof cartData.title).toBe('string');
 	expect(typeof cartData.category).toBe('string');
 	expect(typeof cartData.price).toBe('number');
-	// expect(cartData.img.length).not.toBe(0);
+	expect(cartData.img.length).not.toBe(0);
 	expect(Array.isArray(cartData.options)).toBeTruthy();
 	expect(isOptions).toBeTruthy();
 });

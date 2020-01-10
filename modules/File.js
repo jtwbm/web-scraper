@@ -30,17 +30,27 @@ module.exports = class File {
     }
 
     async rmDir(path, config = { recursive: false }) {
-        // если стоит св-во recursive, удалять файлы, если есть в папке, если нет - выводить ошибку
         const dirList = path.split('/').filter(str => str.length);
+        const dirContent = fs.readdirSync(path);
 
-        if(dirList.length && config.recursive) {
+        if(!dirList.length) {
+            throw new Error('Incorrected path');
+        }
+
+        if(!dirContent.length && !config.recursive) {
+            throw new Error(`${ path } is not empty`);
+        }
+
+        if(config.recursive) {
             fs.readdirSync(path).forEach(file => {
                 this.rmFile(`${ path }/${ file }`);
             });
         }
 
-        rm(dirList);
-        
+        if(fs.existsSync(path)) {
+            rm(dirList);
+        }
+
         function rm(arPath) {
             if(arPath.length && !fs.existsSync(arPath)) {
                 fs.rmdirSync(arPath.join('/'));

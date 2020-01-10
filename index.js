@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Parser = require('./modules/Parser.js');
+const File = require('./modules/File.js');
 
 (async () => {
 	const parser = new Parser();
@@ -16,11 +17,13 @@ const Parser = require('./modules/Parser.js');
 	});
 
 
-	// надо удалять медиа файлы перед запуском скрипта
 	// добавить в консоль прогресс
 	function main(urls, callback) {
 		let result = [];
 		let n = 0;
+
+		const f = new File();
+		f.rmDir('media/toys', { recursive: true });
 
 		cartPromise(n);
 
