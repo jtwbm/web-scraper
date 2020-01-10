@@ -1,6 +1,9 @@
 const fs = require('fs');
 const Parser = require('./modules/Parser.js');
 const File = require('./modules/File.js');
+const cliProgress = require('cli-progress');
+
+const consoleBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
 (async () => {
 	const parser = new Parser();
@@ -16,14 +19,18 @@ const File = require('./modules/File.js');
 		console.log(data)
 	});
 
+	// в конце создать json
+	// сделать отдельный конфиг
+	// вынести в Parser метод обработки конфига
 
-	// добавить в консоль прогресс
 	function main(urls, callback) {
 		let result = [];
 		let n = 0;
 
 		const f = new File();
 		f.rmDir('media/toys', { recursive: true });
+
+		consoleBar.start(urls.length, 0);
 
 		cartPromise(n);
 
@@ -63,15 +70,16 @@ const File = require('./modules/File.js');
 
 				        return result;
 					});
-					console.log(data)
 					result.push(data);
+					consoleBar.update(index + 1);
 					resolve(index + 1);
 				})()
 			}).then(index => {
 				if(index < urls.length) {
-					cartPromise(index)
+					cartPromise(index);
 				} else {
 					callback(result);
+					consoleBar.stop();
 				}
 			});
 		}
