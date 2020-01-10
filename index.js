@@ -29,7 +29,7 @@ const Parser = require('./modules/Parser.js');
 				(async () => {
 					const html = await parser.page(urls[index]);
 					await parser._sleep(1000);
-					const data = await parser.getData(html, $ => {
+					const data = await parser.getData(html, async $ => {
 						const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
 
 				        const optResult = [];
@@ -49,14 +49,13 @@ const Parser = require('./modules/Parser.js');
 				            });
 				        });
 
-
 				        const result = {
 				            title: $('.detail h1 span').text().trim(),
 				            description: $('#section-description > div > div > div > div').text().trim(),
 				            category: 'toys',
 				            price,
 				            options: optResult,
-				            // img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
+				            img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
 				        };
 
 				        return result;

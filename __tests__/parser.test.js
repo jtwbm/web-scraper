@@ -23,7 +23,7 @@ it('list of links', async () => {
 });
 
 it('cart data', async () => {
-	const cartData = await parser.getData(cartHTML, $ => {
+	const cartData = await parser.getData(cartHTML, async $ => {
 		const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
 
         const optResult = [];
@@ -50,7 +50,7 @@ it('cart data', async () => {
             category: 'toys',
             price,
             options: optResult,
-            // img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
+            img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
         };
 
         return result;
