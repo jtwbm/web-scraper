@@ -22,6 +22,7 @@ const consoleBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_clas
 	// в конце создать json
 	// сделать отдельный конфиг
 	// вынести в Parser метод обработки конфига
+	// переписать на async/await
 
 	function main(urls, callback) {
 		let result = [];
@@ -59,13 +60,18 @@ const consoleBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_clas
 				            });
 				        });
 
+				        const img = await parser.getImg($('.magnifier-image img').attr('src'));
+				        const imgPath = `./media/toys/${ index }.${ img.extension }`;
+
+				        await f.addFile(imgPath, img.data);
+
 				        const result = {
 				            title: $('.detail h1 span').text().trim(),
 				            description: $('#section-description > div > div > div > div').text().trim(),
 				            category: 'toys',
 				            price,
 				            options: optResult,
-				            img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
+				            img: imgPath,
 				        };
 
 				        return result;

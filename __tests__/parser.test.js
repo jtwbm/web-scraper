@@ -43,13 +43,18 @@ it('cart data', async () => {
             });
         });
 
+        const img = await parser.getImg($('.magnifier-image img').attr('src'));
+        const imgPath = `testMedia/toys/1.${ img.extension }`;
+
+        await f.addFile(imgPath, img.data);
+
         const result = {
             title: $('.detail h1 span').text().trim(),
             description: $('#section-description > div > div > div > div').text().trim(),
             category: 'toys',
             price,
             options: optResult,
-            img: await parser.getImg($('.magnifier-image img').attr('src'), 'toys', 'media')
+            img: imgPath,
         };
 
         return result;
@@ -68,14 +73,17 @@ it('cart data', async () => {
 	expect(cartData.img.length).not.toBe(0);
 	expect(Array.isArray(cartData.options)).toBeTruthy();
 	expect(isOptions).toBeTruthy();
+
+	await f.rmDir('testMedia', { recursive: true });
 });
 
 it('load image', async () => {
-	const imgUrlAfterParsing = await parser.getImg('https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg', 'testMedia', '');
-	const imgExists = await fs.existsSync(imgUrlAfterParsing);
+	const img = await parser.getImg('https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg');
+	const imgUrl = `./testImg/test/1.${ img.extension }`;
 
-	expect(typeof imgUrlAfterParsing).toBe('string');
-	expect(imgExists).toBeTruthy();
+	await f.addFile(imgUrl, img.data);
 
-	await f.rmDir('testMedia', { recursive: true });
+	expect(fs.existsSync(imgUrl)).toBeTruthy();
+
+	await f.rmDir('testImg', { recursive: true });
 });

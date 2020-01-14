@@ -36,21 +36,13 @@ module.exports = class Parser {
         return await callback.call(null, $);
     }
 
-    async getImg(imgUrl, category, mediaFolder) {
-        // разбить получение картинки и запись в ФС
-        const data = await this.page(imgUrl, true);
-        const imgName = Math.round(Math.random() * 1000000) + '.' + imgUrl.split('.').pop();
-        const imgPath = `./${ mediaFolder }/${ category }/${ imgName }`;
-
-        await this.file.mkDir(`./${ mediaFolder }/${ category }/`);
-
-        fs.writeFileSync(imgPath, data, function (err) {
-            if (err) {
-                return console.log(err);
-            }
-        });
-
-        return imgPath;
+    async getImg(imgUrl) {
+        const img = await this.page(imgUrl, true);
+        const result = {
+            data: img,
+            extension: imgUrl.split('.').pop(),
+        };
+        return result;
     }
 
     async $(html) {

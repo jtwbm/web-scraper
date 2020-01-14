@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Path = require('path');
 
 module.exports = class File {
     constructor() {}
@@ -29,33 +30,22 @@ module.exports = class File {
         }
     }
 
-    async rmDir(path, config = { recursive: false }) {
-        const dirList = path.split('/').filter(str => str.length);
-        const dirContent = fs.readdirSync(path);
+    async rmDir(path = false, config = { recursive: false }) {
+        if(!path) throw new Error('Incorrected path');
 
-        if(!dirList.length) {
-            throw new Error('Incorrected path');
-        }
+        await rm(path);
 
-        if(!dirContent.length && !config.recursive) {
-            throw new Error(`${ path } is not empty`);
-        }
-
-        if(config.recursive) {
-            fs.readdirSync(path).forEach(file => {
-                this.rmFile(`${ path }/${ file }`);
+        async function rm(path) {
+            fs.readdirSync(path).forEach(async file => {
+                if(Path.extname(file)) {
+                    fs.unlinkSync(`${ path }/${ file }`, err => console.log(err));
+                } else {
+                    await rm(`${ path }/${ file }`);
+                }
             });
-        }
 
-        if(fs.existsSync(path)) {
-            rm(dirList);
-        }
-
-        function rm(arPath) {
-            if(arPath.length && !fs.existsSync(arPath)) {
-                fs.rmdirSync(arPath.join('/'));
-                arPath.splice(arPath.length - 1, 1);
-                rm(arPath);
+            if(fs.existsSync(path)) {
+                fs.rmdirSync(path, err => console.log(err));
             }
         }
     }

@@ -22,10 +22,10 @@
     "cheerio": "^1.0.0-rc.3",
     "cli-progress": "^3.5.0",
     "jest": "^24.9.0",
+    "path": "^0.12.7",
     "puppeteer": "^2.0.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.5",
-    "rimraf": "^3.0.0"
+    "request-promise": "^4.2.5"
   },
   "devDependencies": {}
 }
