@@ -33,14 +33,12 @@ module.exports = class File {
     async rmDir(path = false, config = { recursive: true }) {
         if(!path) throw new Error('Incorrected path');
 
-        await rm(path);
-
-        async function rm(path) {
+        const rm = async (path) => {
             fs.readdirSync(path).forEach(async file => {
                 if(config.recursive === false) throw new Error(`${ path } is not empty`); 
                 
                 if(Path.extname(file)) {
-                    fs.unlinkSync(`${ path }/${ file }`, err => console.log(err));
+                    this.rmFile(`${ path }/${ file }`);
                 } else {
                     await rm(`${ path }/${ file }`);
                 }
@@ -50,5 +48,7 @@ module.exports = class File {
                 fs.rmdirSync(path, err => console.log(err));
             }
         }
+
+        await rm(path);
     }
 }

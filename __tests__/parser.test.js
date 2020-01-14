@@ -73,7 +73,6 @@ it('cart data', async () => {
 	expect(cartData.img.length).not.toBe(0);
 	expect(Array.isArray(cartData.options)).toBeTruthy();
 	expect(isOptions).toBeTruthy();
-
 	await f.rmDir('testMedia');
 });
 
@@ -82,8 +81,6 @@ it('load image', async () => {
 	const imgUrl = `./testImg/test/1.${ img.extension }`;
 
 	await f.addFile(imgUrl, img.data);
-
 	expect(fs.existsSync(imgUrl)).toBeTruthy();
-
 	await f.rmDir('testImg');
 });
