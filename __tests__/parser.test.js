@@ -74,7 +74,7 @@ it('cart data', async () => {
 	expect(Array.isArray(cartData.options)).toBeTruthy();
 	expect(isOptions).toBeTruthy();
 
-	await f.rmDir('testMedia', { recursive: true });
+	await f.rmDir('testMedia');
 });
 
 it('load image', async () => {
@@ -85,5 +85,5 @@ it('load image', async () => {
 
 	expect(fs.existsSync(imgUrl)).toBeTruthy();
 
-	await f.rmDir('testImg', { recursive: true });
+	await f.rmDir('testImg');
 });

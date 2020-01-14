@@ -29,7 +29,7 @@ const consoleBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_clas
 		let n = 0;
 
 		const f = new File();
-		f.rmDir('media/toys', { recursive: true });
+		f.rmDir('media/toys');
 
 		consoleBar.start(urls.length, 0);
 

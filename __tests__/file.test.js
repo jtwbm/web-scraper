@@ -16,7 +16,7 @@ it('render json', async () => {
 	const jsonData = JSON.stringify(JSON.parse(fs.readFileSync('testJSON/test.json')));
 
 	expect(jsonData).toBe(JSON.stringify(data));
-	await f.rmDir('testJSON', { recursive: true });
+	await f.rmDir('testJSON');
 });
 
 it('add/remove file', async () => {
@@ -30,7 +30,7 @@ it('add/remove file', async () => {
 	expect(fs.existsSync(filePath)).toBeTruthy();
 	expect(fs.readFileSync(filePath, 'utf8')).toBe(fileData);
 
-	await f.rmDir('testFile', { recursive: true });
+	await f.rmDir('testFile');
 });
 
 it('make, remove dir', async () => {
@@ -42,7 +42,7 @@ it('make, remove dir', async () => {
 	expect(fs.existsSync(path1)).toBeTruthy();
 	expect(fs.existsSync(path2)).toBeTruthy();
 
-	await f.rmDir('testFolder', { recursive: true });
+	await f.rmDir('testFolder');
 	expect(!fs.existsSync('testFolder')).toBeTruthy();
 });
 
