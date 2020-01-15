@@ -37,6 +37,8 @@ module.exports = class Parser {
     }
 
     async getImg(imgUrl) {
+        if(!imgUrl) return false;
+
         const img = await this.page(imgUrl, true);
         const result = {
             data: img,
