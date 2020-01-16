@@ -3,12 +3,63 @@ const cheerio = require('cheerio');
 const fs = require("fs");
 const rimraf = require("rimraf");
 const File = require('./File.js');
+const cliProgress = require('cli-progress');
 
 module.exports = class Parser {
     constructor(config = {}) {
         this.file = new File();
     }
-    
+
+    async init(config) {
+        let consoleBar;
+        let result = [];
+
+        if(config.beforeFn) await config.beforeFn();
+
+        if(config.progressBar) {
+            consoleBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+            consoleBar.start(config.urls.length, 0);
+        }
+
+        const fn = async (index) => {
+            const html = await this.page(config.urls[index]);
+            await this._sleep(1000);
+            
+            await this.getData(html, async ($) => {
+                let itemData = {};
+
+                const start = async () => {
+                  await asyncForEach(config.items, async (item) => {
+                    itemData[item.key] = $(item.el).text() || null;
+                    if(item.value) itemData[item.key] = item.value;
+                    if(item.callback) itemData[item.key] = await item.callback(item.el, $, index);
+                  });
+                  result.push(itemData);
+                }
+                await start();
+
+                async function asyncForEach(array, callback) {
+                      for (let index = 0; index < array.length; index++) {
+                        await callback(array[index], index, array);
+                      }
+                }
+            });
+
+            if(index + 1 < config.urls.length) {
+                if(config.progressBar) consoleBar.update(index + 1);
+                await fn(index + 1);
+            } else {
+                if(config.progressBar) {
+                    consoleBar.update(index + 1);
+                    consoleBar.stop();
+                }
+                if(config.afterFn) await config.afterFn(result);
+            }
+        }
+
+        await fn(0);
+    }
+
     async page(url = '', isFile = false) {
         const browser = await puppeteer.launch({ headless: true });
         let page = await browser.newPage();

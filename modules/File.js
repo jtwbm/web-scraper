@@ -33,6 +33,8 @@ module.exports = class File {
     async rmDir(path = false, config = { recursive: true }) {
         if(!path) throw new Error('Incorrected path');
 
+        if(!fs.existsSync(path)) return;
+
         const rm = async (path) => {
             fs.readdirSync(path).forEach(async file => {
                 if(config.recursive === false) throw new Error(`${ path } is not empty`); 
