@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Parser = require('./modules/Parser.js');
 const File = require('./modules/File.js');
 
@@ -6,7 +5,6 @@ const f = new File();
 
 (async () => {
 	const parser = new Parser();
-	const listHTML = await parser.page('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
 
 	let arCartUrls = [];
 	const linksConfig = {
@@ -27,12 +25,7 @@ const f = new File();
 			arCartUrls = data[0];
 		},
 	};
-
 	await parser.init(linksConfig);
-	
-	// сделать автоматические тесты на основе конфига
-	// сделать возможность непосредственно в инит закидывать конфиг и в new Parser
-	// провести рефакторинг
 
 	const config = {
 		urls: arCartUrls,
@@ -104,9 +97,10 @@ const f = new File();
 		},
 		afterFn: async (data) => {
 			await f.renderJSON(data, 'json', 'toys');
+			console.log('json was created!');
 		},
 	};
 
-	parser.init(config);
+	await parser.init(config);
 	
 })();

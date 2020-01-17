@@ -6,7 +6,7 @@ const File = require('./File.js');
 const cliProgress = require('cli-progress');
 
 module.exports = class Parser {
-    constructor(config = {}) {
+    constructor() {
         this.file = new File();
     }
 
