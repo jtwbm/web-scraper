@@ -28,21 +28,26 @@ module.exports = class Parser {
             await this.getData(html, async ($) => {
                 let itemData = {};
 
-                const start = async () => {
-                  await asyncForEach(config.items, async (item) => {
-                    itemData[item.key] = $(item.el).text() || null;
-                    if(item.value) itemData[item.key] = item.value;
-                    if(item.callback) itemData[item.key] = await item.callback(item.el, $, index);
-                  });
-                  result.push(itemData);
-                }
-                await start();
+                await asyncForEach(config.items, async (item) => {
+                    if(item.key) {
+                        itemData[item.key] = $(item.el).text() || null;
+                        if(item.value) itemData[item.key] = item.value;
+                        if(item.callback) itemData[item.key] = await item.callback(item.el, $, index);
+                    } else {
+                        itemData = $(item.el).text() || null;
+                        if(item.value) itemData = item.value;
+                        if(item.callback) itemData = await item.callback(item.el, $, index);
+                    }
+                });
+                result.push(itemData);
 
                 async function asyncForEach(array, callback) {
                       for (let index = 0; index < array.length; index++) {
                         await callback(array[index], index, array);
                       }
                 }
+
+
             });
 
             if(index + 1 < config.urls.length) {

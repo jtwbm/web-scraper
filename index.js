@@ -8,12 +8,27 @@ const f = new File();
 	const parser = new Parser();
 	const listHTML = await parser.page('https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/');
 
-	// переписать с конфигом
-	const arCartUrls = await parser.getData(listHTML, $ => {
-		return $('.widget-search-result-container a').map((index, link) => {
-			return 'https://www.ozon.ru' + $(link).attr('href').trim();
-		}).get();
-	});
+	let arCartUrls = [];
+	const linksConfig = {
+		urls: ['https://www.ozon.ru/category/nastolnye-igry-dlya-detey-7172/'],
+		progressBar: true,
+		items: [
+			{
+				el: '.widget-search-result-container a',
+				callback: (el, $) => {
+					return $(el).map((index, link) => {
+						return 'https://www.ozon.ru' + $(link).attr('href').trim();
+					}).get();
+				},
+			}
+		],
+		afterFn: (data) => {
+			console.log('get list of links complete!');
+			arCartUrls = data[0];
+		},
+	};
+
+	await parser.init(linksConfig);
 	
 	// сделать автоматические тесты на основе конфига
 	// сделать возможность непосредственно в инит закидывать конфиг и в new Parser
