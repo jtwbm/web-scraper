@@ -27,10 +27,7 @@ $ yarn run test
 # Запуск парсера
 $ node index.js
 ```
-
-## DOCS
-
-### Init scraper
+### Example
 ```sh
 # импорт класса
 $ const Scraper = require('./modules/Scraper.js');
@@ -62,6 +59,9 @@ $ const scraperConfig = {
 		console.log('start!');
 	},
 	afterFn: (data) => {
+		/** data:
+		 *
+		*/
 		console.log('finish!');
 	},
 };
@@ -69,6 +69,27 @@ $ const scraperConfig = {
 # Запуск скрапера
 scraper.init(scraperConfig);
 ```
+
+## DOCS
+
+### Scraper config
+| option | type | description |
+|--|--|--|
+| `urls` | *Array* <*String*> | Список URL, с которыми будет работать скрапер |
+| `progressBar` | *Boolean* | Показывать или нет прогрессбар в консоли. По умолчанию `false`. |
+| `items` | *Array* <*Object*> | Список строк для одного `item`, которые попадут в итоговый массив данных. |
+| `beforeFn` | *Function* | Функция, которая выполнится перед запуском скрапера. |
+| `afterFn(data)` | *Function* | Callback-функция, которая выполнится после окончания сбора данных. `data` - все полученные данные. |
+
+**item**
+| option | type | description |
+|--|--|--|
+| `key` | *String* | Название поля. |
+| `el` | *String* | jQuery-подобный селектор блока, с которым предстоит работать. |
+| `value` | *Any* | Захардкоженное значение поля. Если оно стоит, `el` и `callback` игнорируются. |
+| `callback(el, $, index)` | *Function* | Callback-функция. `el` - селектор блока. `$` - см. [cheerio](https://github.com/cheeriojs/cheerio). `index` - индекс текущего `item`. |
+
+
 ### Scraper.init(config) *`async`*
 Запуск скрапера, `config` - см. пример выше.
 
@@ -81,9 +102,11 @@ $ scraper.init(config);
 ```
 ### File.renderJSON(data, path, fileName) *`async`*
 Генерация json-файла из массива данных.
-`data` - массив данных
-`path` - путь до папки, в котором должен лежать файл
-`fileName` -  название файла
+| argument | description |
+|--|--|
+| `data` | массив данных |
+| `path` | путь до папки, в котором должен лежать файл |
+| `fileName` | название файла |
 
 ```sh
 # index.js
@@ -93,9 +116,12 @@ $ f.renderJSON([item1, item2,..], 'yourFolder', 'myJSON'); // render file by pat
 ```
 
 ### File.addFile(path, data = '') *`async`*
-Генерация файла
-`path` - путь до файла
-`data` - данные файла, по умолчанию `''`
+Создание файла.
+| argument | description |
+|--|--|
+| `path` | путь до файла |
+| `data` | данные файла, по умолчанию `''` |
+
 ```sh
 # index.js
 $ const File = require('./modules/File.js');
@@ -103,8 +129,10 @@ $ const f = new File();
 $ f.addFile('folder/subfolder/test.txt', 'hello'); // render file by path: 'folder/subfolder/test.txt' with text 'hello'
 ```
 ### File.rmFile(path) 
-Удаление файла
-`path` - путь до файла
+Удаление файла.
+| argument | description |
+|--|--|
+| `path` | путь до файла |
 ```sh
 # index.js
 $ const File = require('./modules/File.js');
@@ -112,8 +140,11 @@ $ const f = new File();
 $ f.rmFile('folder/subfolder/test.txt'); // remove file by path: 'folder/subfolder/test.txt'
 ```
 ### File.mkDir(path)
-Создание папки
-`path` - путь до папки
+Создание папки.
+| argument | description |
+|--|--|
+| `path` | путь до папки |
+
 ```sh
 # index.js
 $ const File = require('./modules/File.js');
@@ -121,9 +152,12 @@ $ const f = new File();
 $ f.mkDir('folder1/folder2'); // add folders 'folder1' && 'folder1/folder2'
 ```
 ### File.rmDir(path, { recursive: true }) *`async`*
-Удаление папки
-`path` - путь до папки
-`recursive` - если стоит `false`, генерируется ошибка, если папка не пуста. По умолчанию `true` - кроме самой папки удаляет все файлы, лежащие в ней.
+Удаление папки.
+| argument | description |
+|--|--|
+| `path` | путь до папки |
+| `recursive` | если стоит `false`, генерируется ошибка, если папка не пуста. По умолчанию `true` - кроме самой папки удаляет все файлы, лежащие в ней. |
+
 ```sh
 # index.js
 $ const File = require('./modules/File.js');
