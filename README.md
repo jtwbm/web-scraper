@@ -61,17 +61,20 @@ const scraperConfig = {
 		console.log('start!');
 	},
 	afterFn: (data) => {
-		// data:
-		// [
-		//     {
-		//         "attrName1": "some value 1",
-		//         "attrName2": 0
-		//     },
-		//     {
-		//         "attrName1": "some value 2",
-		//         "attrName2": 1
-		//     }
-		// ]
+#	
+#       data:
+#        [
+#            {
+#                "attrName1": "some value 1",
+#                "attrName2": 0
+#            },
+#            {
+#                "attrName1": "some value 2",
+#                "attrName2": 1
+#            }
+#        ]
+#
+
 		console.log('finish!');
 	},
 };
@@ -91,7 +94,7 @@ scraper.init(scraperConfig);
 | `beforeFn` | *Function* | Функция, которая выполнится перед запуском скрапера. |
 | `afterFn(data)` | *Function* | Callback-функция, которая выполнится после окончания сбора данных. `data` - все полученные данные. |
 
-**item**
+### Item config
 | option | type | description |
 |--|--|--|
 | `key` | *String* | Название поля. |
