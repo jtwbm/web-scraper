@@ -81,7 +81,8 @@ scraper.init(scraperConfig);
 | `beforeFn` | *Function* | Функция, которая выполнится перед запуском скрапера. |
 | `afterFn(data)` | *Function* | Callback-функция, которая выполнится после окончания сбора данных. `data` - все полученные данные. |
 
-**item**
+### item
+
 | option | type | description |
 |--|--|--|
 | `key` | *String* | Название поля. |
