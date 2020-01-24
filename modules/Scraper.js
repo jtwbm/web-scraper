@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const fs = require("fs");
-const rimraf = require("rimraf");
 const File = require('./File.js');
 const cliProgress = require('cli-progress');
 
