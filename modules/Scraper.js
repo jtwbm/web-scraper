@@ -5,7 +5,7 @@ const rimraf = require("rimraf");
 const File = require('./File.js');
 const cliProgress = require('cli-progress');
 
-module.exports = class Parser {
+module.exports = class Scraper {
     constructor() {
         this.file = new File();
     }

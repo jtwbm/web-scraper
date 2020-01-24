@@ -1,14 +1,14 @@
 const fs = require('fs');
-const Parser = require('../modules/Parser.js');
+const Scraper = require('../modules/Scraper.js');
 const File = require('../modules/File.js');
 
 const listHTML = fs.readFileSync('__tests__/list.html', 'utf8', err => console.log(err));
 const cartHTML = fs.readFileSync('__tests__/cart.html', 'utf8', err => console.log(err));
-const parser = new Parser();
+const scraper = new Scraper();
 const f = new File();
 
 it('list of links', async () => {
-	const urlList = await parser.getData(listHTML, $ => {
+	const urlList = await scraper.getData(listHTML, $ => {
 		return $('.widget-search-result-container a').map((index, link) => {
 			return 'https://www.ozon.ru' + $(link).attr('href').trim();
 		}).get();
@@ -23,7 +23,7 @@ it('list of links', async () => {
 });
 
 it('cart data', async () => {
-	const cartData = await parser.getData(cartHTML, async $ => {
+	const cartData = await scraper.getData(cartHTML, async $ => {
 		const price = Number($('.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child').text().replace(/[ \s₽]/gi, '').trim());
 
         const optResult = [];
@@ -43,7 +43,7 @@ it('cart data', async () => {
             });
         });
 
-        const img = await parser.getImg($('.magnifier-image img').attr('src'));
+        const img = await scraper.getImg($('.magnifier-image img').attr('src'));
         const imgPath = `testMedia/toys/1.${ img.extension }`;
 
         await f.addFile(imgPath, img.data);
@@ -77,7 +77,7 @@ it('cart data', async () => {
 });
 
 it('load image', async () => {
-	const img = await parser.getImg('https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg');
+	const img = await scraper.getImg('https://cdn1.ozone.ru/multimedia/c1200/1026585512.jpeg');
 	const imgUrl = `./testImg/test/1.${ img.extension }`;
 
 	await f.addFile(imgUrl, img.data);

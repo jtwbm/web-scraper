@@ -1,5 +1,6 @@
+
 # WEB scraper
-Веб-скрапер для сбора тестовых данных. Пример сбора данных находится в `index.js`. Там я собираю некоторые данные о товарах с интернет-магазина Ozon.
+Веб-скрапер для сбора тестовых данных. Пример сбора данных находится в `index.js`. Там я собираю некоторые данные о товарах из интернет-магазина Ozon.
 
 > За любое использование парсера в незаконных целях вы самостоятельно несете полную юридическую ответсвенность
 
@@ -27,18 +28,18 @@ $ yarn run test
 $ node index.js
 ```
 
-## API
+## DOCS
 
-### class Parser
+### Init scraper
 ```sh
 # импорт класса
-$ const Parser = require('./modules/Parser.js');
+$ const Scraper = require('./modules/Scraper.js');
 
 # создание экземпляра класса
-$ const parser = new Parser();
+$ const scraper = new Scraper();
 
 # пример конфига
-$ const parserConfig = {
+$ const scraperConfig = {
 	urls: ['url1', 'url2', ...],
 	progressBar: true,
 	items: [
@@ -64,4 +65,69 @@ $ const parserConfig = {
 		console.log('finish!');
 	},
 };
+
+# Запуск скрапера
+scraper.init(scraperConfig);
 ```
+### Scraper.init(config) *`async`*
+Запуск скрапера, `config` - см. пример выше.
+
+```sh
+# index.js
+$ const Scraper = require('./modules/Scraper.js');
+$ const scraper = new Scraper();
+$ const config = {options...};
+$ scraper.init(config);
+```
+### File.renderJSON(data, path, fileName) *`async`*
+Генерация json-файла из массива данных.
+`data` - массив данных
+`path` - путь до папки, в котором должен лежать файл
+`fileName` -  название файла
+
+```sh
+# index.js
+$ const File = require('./modules/File.js');
+$ const f = new File();
+$ f.renderJSON([item1, item2,..], 'yourFolder', 'myJSON'); // render file by path: 'yourFolder/myJSON.json'
+```
+
+### File.addFile(path, data = '') *`async`*
+Генерация файла
+`path` - путь до файла
+`data` - данные файла, по умолчанию `''`
+```sh
+# index.js
+$ const File = require('./modules/File.js');
+$ const f = new File();
+$ f.addFile('folder/subfolder/test.txt', 'hello'); // render file by path: 'folder/subfolder/test.txt' with text 'hello'
+```
+### File.rmFile(path) 
+Удаление файла
+`path` - путь до файла
+```sh
+# index.js
+$ const File = require('./modules/File.js');
+$ const f = new File();
+$ f.rmFile('folder/subfolder/test.txt'); // remove file by path: 'folder/subfolder/test.txt'
+```
+### File.mkDir(path)
+Создание папки
+`path` - путь до папки
+```sh
+# index.js
+$ const File = require('./modules/File.js');
+$ const f = new File();
+$ f.mkDir('folder1/folder2'); // add folders 'folder1' && 'folder1/folder2'
+```
+### File.rmDir(path, { recursive: true }) *`async`*
+Удаление папки
+`path` - путь до папки
+`recursive` - если стоит `false`, генерируется ошибка, если папка не пуста. По умолчанию `true` - кроме самой папки удаляет все файлы, лежащие в ней.
+```sh
+# index.js
+$ const File = require('./modules/File.js');
+$ const f = new File();
+$ f.rmDir('folder1/folder2'); // remove `folder2` from 'folder1'
+```
+

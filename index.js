@@ -1,10 +1,10 @@
-const Parser = require('./modules/Parser.js');
+const Scraper = require('./modules/Scraper.js');
 const File = require('./modules/File.js');
 
 const f = new File();
 
 (async () => {
-	const parser = new Parser();
+	const scraper = new Scraper();
 
 	let arCartUrls = [];
 	const linksConfig = {
@@ -25,7 +25,7 @@ const f = new File();
 			arCartUrls = data[0];
 		},
 	};
-	await parser.init(linksConfig);
+	await scraper.init(linksConfig);
 
 	const config = {
 		urls: arCartUrls,
@@ -60,7 +60,7 @@ const f = new File();
 				key: 'cover',
 				el: '.magnifier-image img',
 				callback: async (el, $, index) => {
-					const img = await parser.getImg($(el).attr('src'));
+					const img = await scraper.getImg($(el).attr('src'));
 			        const imgPath = img ?  `./media/toys/${ index }.${ img.extension }` : null;
 
 			        if(img) await f.addFile(imgPath, img.data);
@@ -91,8 +91,8 @@ const f = new File();
 				},
 			},
 		],
-		beforeFn: () => {
-			f.rmDir('media/toys');
+		beforeFn: async () => {
+			await f.rmDir('media/toys');
 			f.rmFile('json/toys.json');
 		},
 		afterFn: async (data) => {
@@ -101,6 +101,6 @@ const f = new File();
 		},
 	};
 
-	await parser.init(config);
+	await scraper.init(config);
 	
 })();
