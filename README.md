@@ -28,6 +28,7 @@ $ yarn run test
 $ node index.js
 ```
 ### Example
+
 *Полный пример конфига, в т. ч.  для сохранения картинок, можно посмотреть в файле `index.js` в корне проекта.*
 
 ```sh
@@ -104,7 +105,9 @@ scraper.init(scraperConfig);
 
 
 ### Scraper.init(config) *`async`*
+
 Запуск скрапера, `config` - см. пример выше.
+
 
 ```sh
 # index.js
@@ -114,7 +117,9 @@ $ const config = {options...};
 $ scraper.init(config);
 ```
 ### File.renderJSON(data, path, fileName) *`async`*
+
 Генерация json-файла из массива данных.
+
 | argument | description |
 |--|--|
 | `data` | массив данных |
@@ -129,7 +134,9 @@ $ f.renderJSON([item1, item2,..], 'yourFolder', 'myJSON'); // render file by pat
 ```
 
 ### File.addFile(path, data = '') *`async`*
+
 Создание файла.
+
 | argument | description |
 |--|--|
 | `path` | путь до файла |
@@ -142,7 +149,9 @@ $ const f = new File();
 $ f.addFile('folder/subfolder/test.txt', 'hello'); // render file by path: 'folder/subfolder/test.txt' with text 'hello'
 ```
 ### File.rmFile(path) 
+
 Удаление файла.
+
 | argument | description |
 |--|--|
 | `path` | путь до файла |
@@ -153,7 +162,9 @@ $ const f = new File();
 $ f.rmFile('folder/subfolder/test.txt'); // remove file by path: 'folder/subfolder/test.txt'
 ```
 ### File.mkDir(path)
+
 Создание папки.
+
 | argument | description |
 |--|--|
 | `path` | путь до папки |
@@ -165,7 +176,9 @@ $ const f = new File();
 $ f.mkDir('folder1/folder2'); // add folders 'folder1' && 'folder1/folder2'
 ```
 ### File.rmDir(path, { recursive: true }) *`async`*
+
 Удаление папки.
+
 | argument | description |
 |--|--|
 | `path` | путь до папки |
@@ -178,3 +191,6 @@ $ const f = new File();
 $ f.rmDir('folder1/folder2'); // remove `folder2` from 'folder1'
 ```
 
+# Вопросы?
+
+Если у вас возникли вопросы по поводу использования скрапера, либо вы заметили ошибку, напишите мне: jukaenerdjaizer@gmail.com
