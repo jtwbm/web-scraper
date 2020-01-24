@@ -28,30 +28,32 @@ $ yarn run test
 $ node index.js
 ```
 ### Example
+*Полный пример конфига, в т. ч.  для сохранения картинок, можно посмотреть в файле `index.js` в корне проекта.*
+
 ```sh
 # импорт класса
-$ const Scraper = require('./modules/Scraper.js');
+const Scraper = require('./modules/Scraper.js');
 
 # создание экземпляра класса
-$ const scraper = new Scraper();
+const scraper = new Scraper();
 
 # пример конфига
-$ const scraperConfig = {
+const scraperConfig = {
 	urls: ['url1', 'url2', ...],
 	progressBar: true,
 	items: [
 		{
 			key: 'attrName1',
 			el: '.myClass1',
-			callback: (el, $) => {
-				return $(el).text();
+			callback: $el => {
+				return $el.text();
 			},
 		},
 		{
 			key: 'attrName2',
 			el: '.myClass2',
-			callback: (el, $, index) => {
-				return Number($(el).text()) * index;
+			callback: ($el, $, index) => {
+				return index;
 			},
 		},
 	],
@@ -59,9 +61,17 @@ $ const scraperConfig = {
 		console.log('start!');
 	},
 	afterFn: (data) => {
-		/** data:
-		 *
-		*/
+		// data:
+		// [
+		//     {
+		//         "attrName1": "some value 1",
+		//         "attrName2": 0
+		//     },
+		//     {
+		//         "attrName1": "some value 2",
+		//         "attrName2": 1
+		//     }
+		// ]
 		console.log('finish!');
 	},
 };
@@ -81,14 +91,13 @@ scraper.init(scraperConfig);
 | `beforeFn` | *Function* | Функция, которая выполнится перед запуском скрапера. |
 | `afterFn(data)` | *Function* | Callback-функция, которая выполнится после окончания сбора данных. `data` - все полученные данные. |
 
-### item
-
+**item**
 | option | type | description |
 |--|--|--|
 | `key` | *String* | Название поля. |
 | `el` | *String* | jQuery-подобный селектор блока, с которым предстоит работать. |
 | `value` | *Any* | Захардкоженное значение поля. Если оно стоит, `el` и `callback` игнорируются. |
-| `callback(el, $, index)` | *Function* | Callback-функция. `el` - селектор блока. `$` - см. [cheerio](https://github.com/cheeriojs/cheerio). `index` - индекс текущего `item`. |
+| `callback($el, $, index)` | *Function* | Callback-функция. `$el` - объект *cheerio*. `$` - см. [cheerio](https://github.com/cheeriojs/cheerio). `index` - индекс текущего `item`. |
 
 
 ### Scraper.init(config) *`async`*

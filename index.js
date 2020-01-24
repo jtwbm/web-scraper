@@ -34,15 +34,15 @@ const f = new File();
 			{
 				key: 'title',
 				el: '.detail h1 span',
-				callback: (el, $) => {
-					return $(el).text().trim();
+				callback: $el => {
+					return $el.text().trim();
 				},
 			},
 			{
 				key: 'description',
 				el: '#section-description > div > div > div > div',
-				callback: (el, $) => {
-					return $(el).text().trim();
+				callback: $el => {
+					return $el.text().trim();
 				},
 			},
 			{
@@ -52,15 +52,15 @@ const f = new File();
 			{
 				key: 'price',
 				el: '.top-sale-block > div > div:first-child > div:first-child > div > div:first-child > div > div > div > span:first-child',
-				callback: (el, $) => {
-					return Number($(el).text().replace(/[ \s₽]/gi, '').trim());
+				callback: $el => {
+					return Number($el.text().replace(/[ \s₽]/gi, '').trim());
 				},
 			},
 			{
 				key: 'cover',
 				el: '.magnifier-image img',
-				callback: async (el, $, index) => {
-					const img = await scraper.getImg($(el).attr('src'));
+				callback: async ($el, $, index) => {
+					const img = await scraper.getImg($el.attr('src'));
 			        const imgPath = img ?  `./media/toys/${ index }.${ img.extension }` : null;
 
 			        if(img) await f.addFile(imgPath, img.data);
@@ -70,9 +70,9 @@ const f = new File();
 			{
 				key: 'options',
 				el: '#section-characteristics dl',
-				callback: (el, $) => {
+				callback: ($el, $) => {
 					const result = [];
-			        $(el).each((index, item) => {
+			        $el.each((index, item) => {
 			            const titles = $(item).find('dt span').map((index, item) => {
 			                return $(item).text();
 			            }).get();

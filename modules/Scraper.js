@@ -32,11 +32,11 @@ module.exports = class Scraper {
                     if(item.key) {
                         itemData[item.key] = $(item.el).text() || null;
                         if(item.value) itemData[item.key] = item.value;
-                        if(item.callback) itemData[item.key] = await item.callback(item.el, $, index);
+                        if(item.callback) itemData[item.key] = await item.callback($(item.el), $, index);
                     } else {
                         itemData = $(item.el).text() || null;
                         if(item.value) itemData = item.value;
-                        if(item.callback) itemData = await item.callback(item.el, $, index);
+                        if(item.callback) itemData = await item.callback($(item.el), $, index);
                     }
                 });
                 result.push(itemData);
